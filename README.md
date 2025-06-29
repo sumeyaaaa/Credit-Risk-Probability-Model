@@ -194,3 +194,75 @@ Slide deck and technical report
 Model cards for stakeholders
 
 Documentation for regulators
+# Step 1: Clone this repo
+git clone https://github.com/sumeyaaaa/Credit-Risk-Probability-Model
+cd Credit-Risk-Probability-Model
+
+
+# Step 2: Install dependencies
+pip install -r requirements.txt
+
+
+\`\`\`
+"""
+## ⚙️ CI/CD – GitHub Actions
+
+- Implemented GitHub Actions workflow to validate notebook execution and maintain reproducibility.
+
+---
+
+## 📈 Key Skills Demonstrated
+
+- ✅ Git & GitHub Workflow
+- ✅ EDA and data storytelling
+- ✅ feauture engineering
+- ✅ RFM metrics
+- ✅ model training and evaluation
+
+---
+
+## 🧰 Technologies
+
+- Python 3.10+
+- Pandas, Seaborn, Matplotlib
+- Docker
+- Git & GitHub
+
+# Repository structure
+
+├── .github
+│   └── workflows
+│       └── ci.yml                    # Continuous Integration workflow configuration
+├── data
+│   ├── raw                          # Raw input data files (unprocessed)
+│   └── processed                    # Cleaned and transformed data ready for analysis
+├── notebook/
+│   ├── task 1 and 2
+│   │   └── load_EDA.ipynb           # Data loading and exploratory data analysis notebook
+│   ├── task-3                       # Feature engineering and web scraping using google-play-scraper
+│   │   └── feature-engineering.ipynb
+│   ├── task-4                       # Customer segmentation and risk labeling (RFM metrics)
+│   │   └── RFMmetrics.ipynb
+│   ├── task-5                       # Model building, evaluation, and final insights
+│   │   └── modeling.ipynb
+│   ├── task-6                       # Sentiment labeling and thematic keyword extraction
+│       └── sentiment_analysis.ipynb
+├── src/                            # Core Python modules containing business logic
+│   ├── __init__.py                 # Oracle database connection and utilities
+│   ├── load.py                    # Data loading and preprocessing functions
+│   ├── PreProcessing.py           # Text preprocessing utilities (e.g., lemmatization)
+│   ├── RFMmetrics.py              # Customer segmentation and clustering logic
+│   ├── saveFile.py                # Sentiment classification model and related functions
+│   ├── visualization.py           # Visualization utilities for model comparison and analysis
+│   ├── api/                       # API backend code for deployment and data export
+│   │   ├── main.py                # FastAPI app main entrypoint
+│   │   └── pydantic_models.py     # Data validation schemas using Pydantic
+│   └── models/                    # Saved machine learning models and related artifacts
+│       └── best_model.pkl         # Serialized best-performing model
+├── test/                          # Tests and SQL schema definitions for Oracle database
+├── docker-compose.yml             # Docker Compose file for multi-container orchestration
+├── dockerfile                    # Docker image build instructions
+├── LICENSE                       # Project license file
+├── README.md                     # Project overview, methodology, and results summary
+├── .gitignore                    # Specifies files and folders to be excluded from Git
+└── venv/                        # Python virtual environment (excluded from version control)
