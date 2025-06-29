@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 def load_data(path):
     """Load excel data"""
     return pd.read_excel(path)
+def load_data_csv(path):
+    """Load csv data"""
+    return pd.read_csv(path)
 
 def summary_stats(df):
     """Print basic info and stats"""

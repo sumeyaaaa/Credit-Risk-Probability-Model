@@ -47,7 +47,7 @@ def process_data(file_path):
     data['Transaction_Count'] = data.groupby('CustomerId')['TransactionId'].transform('count')
     data['Std_Transaction_Amount'] = data.groupby('CustomerId')['Amount'].transform('std')
     data['Last_Transaction_Date'] = data.groupby('CustomerId')['TransactionStartTime'].transform('max')
-    data['Recency'] = (data['TransactionStartTime'].max() - data['Last_Transaction_Date']).dt.days
+    data['Recency_in_person'] = (data['TransactionStartTime'].max() - data['Last_Transaction_Date']).dt.days
 
     # Extract date features
     data['TransactionStartTime'] = pd.to_datetime(data['TransactionStartTime'])
