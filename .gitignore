@@ -1,0 +1,35 @@
+
+#
+# DVC local storage
+.data/dvc_file/
+
+
+data\dvc_file\
+
+# Ignore actual data files and cache
+*.csv
+data/dvc_file/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data files (don’t track raw or output data)
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+*.db
+*.sqlite
+*.log
