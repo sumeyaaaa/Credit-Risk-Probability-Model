@@ -1,0 +1,8 @@
+pandas
+matplotlib
+fastapi
+uvicorn[standard]
+mlflow
+pydantic
+flake8
+pytest

@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 import mlflow.pyfunc
 import pandas as pd
-from src.api.pydantic_models import import CustomerData, PredictionResponse
+from src.api.pydantic_models import CustomerData, PredictionResponse
 
 app = FastAPI()
 
 # Load model from MLflow Model Registry
-model_name = "best_credit_risk_model"
+model_name = "best_model"
 model_version = 1  # or 'latest'
 model_uri = f"models:/{model_name}/{model_version}"
 model = mlflow.pyfunc.load_model(model_uri)
