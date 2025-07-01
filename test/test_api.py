@@ -1,7 +1,6 @@
 import os
 import sys
-from unittest.mock import patch
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add root to sys.path for imports
 sys.path.insert(
@@ -13,7 +12,6 @@ sys.path.insert(
         )
     ),
 )
-
 
 mock_model = MagicMock()
 mock_model.predict_proba.return_value = [[0.3, 0.7]]
