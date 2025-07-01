@@ -19,10 +19,8 @@ def summary_stats(df):
     """Print basic info and stats"""
     print(df.info())
     print("\n--- Describe Numerical ---\n", df.describe())
-    print(
-        "\n--- Describe Categorical ---\n",
-        df.select_dtypes(include='object').describe()
-    )
+    print("\n--- Describe Categorical ---\n")
+    print(df.select_dtypes(include='object').describe())
 
 
 def logarithmic_numerical_distribution(
@@ -31,7 +29,6 @@ def logarithmic_numerical_distribution(
 ):
     if columns is None:
         columns = ['Amount', 'Value', 'FraudResult']
-
 
     """
     Plot log-scale histograms for positive and negative values of specified columns.
