@@ -1,14 +1,10 @@
 
 #
 # DVC local storage
-.data/dvc_file/
 
-
-data\dvc_file\
 
 # Ignore actual data files and cache
 *.csv
-data/dvc_file/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

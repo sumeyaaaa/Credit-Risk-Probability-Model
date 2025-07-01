@@ -19,7 +19,7 @@ def convert_tz_aware_to_naive(df):
     """
     for col in df.columns:
         if pd.api.types.is_datetime64_any_dtype(df[col]):
-            if hasattr(df[col].dt, 'tz') and df[col].dt.tz is not None:
+            if hasattr(df[col].dt, "tz") and df[col].dt.tz is not None:
                 df[col] = df[col].dt.tz_localize(None)
     return df
 
