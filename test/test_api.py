@@ -1,20 +1,29 @@
 import os
 import sys
-from unittest.mock import MagicMock, patch
-from fastapi.testclient import TestClient
-from api.main import app
+from unittest.mock import patch
+from unittest.mock import MagicMock
 
-# Add src to sys.path for imports
+# Add root to sys.path for imports
 sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+    0,
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            '..',
+        )
+    ),
 )
 
-# --- Patch before importing app ---
+
 mock_model = MagicMock()
 mock_model.predict_proba.return_value = [[0.3, 0.7]]
 
 patcher = patch('mlflow.sklearn.load_model', return_value=mock_model)
 patcher.start()
+
+from fastapi.testclient import TestClient  # noqa: E402
+from api.main import app  # noqa: E402
+
 client = TestClient(app)
 
 
