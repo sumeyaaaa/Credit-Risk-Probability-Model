@@ -1,6 +1,8 @@
 import os
 import sys
 from unittest.mock import MagicMock, patch
+from fastapi.testclient import TestClient
+from api.main import app
 
 # Add src to sys.path for imports
 sys.path.insert(
@@ -13,11 +15,6 @@ mock_model.predict_proba.return_value = [[0.3, 0.7]]
 
 patcher = patch('mlflow.sklearn.load_model', return_value=mock_model)
 patcher.start()
-
-from fastapi.testclient import TestClient
-from api.main import app
-
-
 client = TestClient(app)
 
 
