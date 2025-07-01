@@ -1,196 +1,293 @@
-# Credit-Risk-Probability-Model
-This project aims to develop an end-to-end credit scoring system for Bati Bank to assess the creditworthiness of customers using a Buy-Now-Pay-Later (BNPL) service offered in partnership with an eCommerce platform. 
 
-## Credit Scoring Business Understanding
+# Credit Risk Probability Model
+
+## Executive Summary
+
+This project delivers an end-to-end credit scoring system for Bati Bank’s Buy-Now-Pay-Later (BNPL) program in partnership with an eCommerce platform. It transforms transactional behavior data into risk signals using interpretable and auditable machine learning models in compliance with Basel II. The solution includes feature engineering, proxy target creation, model training and evaluation, deployment via FastAPI, and automated CI/CD using GitHub Actions and Docker.
 
-### 1. Basel II and the Need for Interpretability
-The Basel II Accord emphasizes **risk-sensitive capital requirements**, mandating that banks implement internal systems capable of accurately measuring and managing credit risk. According to both the Basel II framework and guidance in the HKMA report, this regulatory focus drives the need for credit scoring models to be:
+---
 
-- **Interpretable**: Regulators require transparency on how inputs influence risk estimates. Complex “black-box” models must be avoided unless accompanied by strong explanation tools.
-- **Auditable**: Every modeling step—from feature selection to probability mapping—must be documented and traceable.
-- **Validated**: Basel II demands model validation across multiple timeframes, customer types, and economic conditions to ensure stability and fairness.
+## Table of Contents
+
+1. [Business Problem](#1-business-problem)  
+2. [Credit Scoring Business Understanding](#2-credit-scoring-business-understanding)  
+3. [Data Overview](#3-data-overview)  
+4. [Feature Engineering](#4-feature-engineering)  
+5. [Proxy Target Variable](#5-proxy-target-variable)  
+6. [Modeling and Experiment Tracking](#6-modeling-and-experiment-tracking)  
+7. [Evaluation Metrics](#7-evaluation-metrics)  
+8. [Model Deployment and API](#8-model-deployment-and-api)  
+9. [Testing and CI/CD Pipeline](#9-testing-and-cicd-pipeline)  
+10. [Installation](#10-installation)  
+11. [Usage](#11-usage)  
+12. [Contributing](#12-contributing)  
+13. [License](#13-license)  
+14. [Acknowledgments](#14-acknowledgments)
 
-This makes **logistic regression with Weight of Evidence (WoE)** and scorecards a popular starting point—they are explainable, stable, and easy to present to risk committees and regulators.
+---
 
-**Summary**
+## 1. Business Problem
+
+Bati Bank aims to launch a BNPL offering via an eCommerce platform. To minimize credit risk and comply with Basel II regulations, a credit scoring model must be developed to assess customer risk based on behavioral transaction data, despite the absence of traditional credit history or default labels.
 
-The Basel II Accord emphasizes risk-based capital adequacy and demands internal models that are transparent, well-documented, and auditable. For a credit scoring model to be Basel II-compliant, it must offer clear explanations of how inputs affect predicted outcomes. This need favors the use of interpretable methods like logistic regression with WoE transformations, which align well with regulatory expectations.
+---
+
+## 2. Credit Scoring Business Understanding
 
-### 2. Why Proxy Variables Are Necessary (and Risky)
-In the absence of labeled "defaults"—typically defined as **90+ day payment delinquencies**—organizations must rely on **proxy variables** to estimate creditworthiness. As highlighted in the *Statistica Sinica* paper, proxy outcomes such as **RFM segmentation**, **repayment behavior**, or **digital activity patterns** allow for supervised modeling where true outcomes are unavailable.
+### 2.1 Basel II and Interpretability
+
+Basel II requires banks to use risk-sensitive capital measurement systems. This favors **interpretable, auditable, and validated** models. Techniques such as **Logistic Regression with Weight of Evidence (WoE)** are preferred due to their transparency and ease of communication with regulators.
 
-However, using proxies comes with business risks:
+### 2.2 Proxy Variables in Place of Defaults
+
+In the absence of true default labels, proxy variables (e.g., RFM behavioral segments) are necessary for supervised learning. However, they carry risks:
 
-- **Label Risk**: If the proxy does not closely match actual default behavior, model predictions may be misleading.
-- **Bias Risk**: Proxy construction can unintentionally encode demographic, behavioral, or platform biases, leading to fairness or ethical concerns.
-- **Regulatory Risk**: Decisions based on weak proxies may be questioned by regulators, especially if high-risk customers are misclassified as low risk, affecting capital buffers.
+- **Label Risk**: Poor proxies lead to misleading predictions.
+- **Bias Risk**: Behavioral proxies may encode socio-economic or demographic bias.
+- **Regulatory Risk**: Decisions based on proxies must be well-documented and justified.
 
-Therefore, proxy variables must be **empirically justified**, **back-tested**, and clearly **disclosed** as approximations of real-world outcomes.
+### 2.3 Simple vs. Complex Models
 
-**Summary**
+| Feature                  | Simple Model (LogReg + WoE)     | Complex Model (e.g., XGBoost)   |
+|--------------------------|----------------------------------|---------------------------------|
+| Interpretability         | ✅ High                          | ❌ Low (needs SHAP/LIME)       |
+| Regulatory Acceptance    | ✅ Preferred                     | ⚠ Requires explainability      |
+| Accuracy                 | ⚠ Moderate                      | ✅ High                         |
+| Deployment Simplicity    | ✅ Easy                          | ⚠ More involved                 |
 
-Due to the lack of direct "default" labels in our data, we construct a proxy variable using behavioral patterns (e.g., RFM analysis) to approximate customer credit risk. This proxy is essential for training a supervised model, but carries risks including misclassification, bias, and regulatory scrutiny. All proxy definitions must be logically justified, empirically validated, and clearly documented.
+We prioritize interpretability and use complex models only when explanations (e.g., SHAP) are provided.
 
-### 3. Trade-Offs Between Simple and Complex Models
+---
 
-As both documents emphasize, financial institutions must carefully choose between **simple models** and **complex models** based on their specific regulatory and business context:
+## 3. Data Overview
 
-| Feature                   | Simple Model (Logistic Regression + WoE) | Complex Model (Gradient Boosting, etc.)       |
-|---------------------------|------------------------------------------|------------------------------------------------|
-| **Interpretability**      | Highly interpretable                     | Often opaque or "black-box"                   |
-| **Regulatory Acceptance** | Preferred (Basel II compliant)           | Requires justification and explainability tools |
-| **Performance**           | Moderate accuracy                        | High predictive power                         |
-| **Fairness & Bias Detection** | Easier to audit and correct         | Difficult without tools like SHAP/LIME        |
-| **Business Alignment**    | Easier to align with credit policy       | May diverge from policy logic                 |
-| **Documentation Effort**  | Lower                                    | Higher (due to complexity)                    |
 
-**Summary**
-Simple models (e.g., logistic regression) provide transparency and easier regulatory approval but may lack performance in capturing nonlinear patterns. Complex models (e.g., gradient boosting) often deliver better predictive accuracy but at the cost of explainability. In regulated settings like ours, we prioritize interpretability, and only consider complex models when their decisions can be made transparent using tools like SHAP or monotonic constraints.
+### 3.1 Project Structure
 
-**Task 2 - Exploratory Data Analysis (EDA)**
-Key EDA Steps
+Copy
+credit-risk-model/
+├── .github/workflows/ci.yml        # CI/CD configuration
+├── data/                           # Data storage (add to .gitignore)
+│   ├── raw/                        # Raw data
+│   └── processed/                  # Processed data for training
+├── notebooks/                      # Jupyter notebooks for analysis
+│   └── task 1 and 2               # Exploratory data analysis
+       └── load_EDA.ipynb               
+    └── task 3               # Feauture engineering
+       └── feature-engineering.ipynb               
+    └── task 4               # RFMmetrics
+       └── RFMmetrics.pynb               
+    └── task 5               # Modeling
+        └── modeling.ipynb              
+├── src/                            # Source code
+│   ├── __init__.py
+    ├── load.py
+    ├── RFMmetrics.py.py
+    ├── saveFile.py.py
+    ├── visualization.py
+│   ├── PreProcessing.py          # Feature engineering script
+│   ├── train.py                    # Model training script
+│   ├── predict.py                  # Inference script
+│   └── api/
+│       ├── main.py                 # FastAPI application
+│       └── pydantic_models.py      # Pydantic models for API
+├── tests/                          # Unit tests
+│   └── test_api.py
+├── Dockerfile                      # Docker configuration
+├── docker-compose.yml              # Docker Compose configuration
+├── requirements.txt                # Project dependencies
+├── .gitignore                      # Git ignore file
+└── README.md                       # Project documentation
+└── LICENSE                       # Project license
+└── register.py                      # register
 
-Dataset overview, data types, and summary statistics
+### 3.1 Data Overview
 
-Visualization of numerical and categorical distributions
 
-Outlier detection and correlation analysis
+| Column             | Description                                      |
+|--------------------|--------------------------------------------------|
+| TransactionId      | Unique transaction identifier                    |
+| AccountId          | Unique customer identifier                       |
+| CustomerId         | Shared ID for customer                           |
+| Amount / Value     | Transaction value (debit/credit)                 |
+| ChannelId          | Platform used (web, Android, iOS)                |
+| ProductCategory    | Grouped product type                             |
+| FraudResult        | Fraud label (1: fraud, 0: normal)                |
+| ...                | Other behavioral and demographic features        |
 
-Missing value identification
+Additional engineered features include RFM metrics and time-based aggregates.
 
-**Key Insights**
+---
 
-Amount and Value are highly skewed with visible outliers
+## 4. Feature Engineering
 
-Many unique AccountIds indicating a broad customer base
+We applied the following techniques:
 
-Imbalanced categorical features (e.g., ChannelId, ProductCategory)
+- **Aggregate Features**:  
+  - Total transaction count  
+  - Total/avg/std of transaction values  
+  - Transaction recency metrics
 
-High correlation between Amount and Value (0.99)
+- **Extracted Features**:  
+  - Hour, day, month of transaction  
+  - Transaction patterns across time
 
-Moderate correlation between Amount and FraudResult (0.57)
+- **Encoding**:  
+  - One-Hot Encoding for nominal features  
+  - WoE encoding for regulatory explainability
 
-**Next Steps**
+- **Handling Missing Values**:  
+  - Imputation with median/most frequent  
+  - Removal when necessary
 
-Apply log transformation to Amount and Value
+- **Scaling**:  
+  - StandardScaler for numerical inputs
 
-One-hot encode low-cardinality categorical features
+---
 
-## Task 3 - Feature Engineering
+## 5. Proxy Target Variable
 
-**Aggregate Features**
+Since no "default" column exists:
 
-Total Transaction Amount
+1. **RFM Metrics** were calculated per customer
+2. **K-Means Clustering** (k=3) was applied on scaled RFM values
+3. The **least engaged cluster** (low frequency & monetary value) was labeled as `is_high_risk = 1`
+4. All other clusters were labeled `0`
 
-Average Transaction Amount
+This binary proxy was added back to the dataset for supervised learning.
 
-Transaction Count
+---
 
-Standard Deviation of Amounts
+## 6. Modeling and Experiment Tracking
 
-**Temporal Features**
+- **Models Trained**:  
+  - Logistic Regression (with WoE)  
+  - Decision Tree  
+  - Random Forest  
+  - Gradient Boosting
 
-Extracted hour, day, month, year, and other calendar components from TransactionStartTime
+- **Experiment Tracking**:  
+  - Tracked all runs with `mlflow`  
+  - Registered best model in the **MLflow Model Registry**
 
-Categorical Encoding
+- **Training Pipeline**:  
+  - `sklearn.pipeline.Pipeline` used for reproducibility  
+  - GridSearchCV for hyperparameter tuning
 
-One-Hot Encoding for low-cardinality features
+---
 
-WoE Encoding for interpretable modeling
+## 7. Evaluation Metrics
 
-**Missing Value Handling**
-Imputation with mean/median/mode as appropriate
+| Metric         | Meaning                                                 |
+|----------------|----------------------------------------------------------|
+| Accuracy       | Overall correct predictions                             |
+| Precision      | Correct positive predictions                            |
+| Recall         | Ability to detect all actual positives                   |
+| F1-Score       | Harmonic average of Precision and Recall                 |
+| ROC AUC        | Class separation capacity of model                      |
 
-Feature Scaling
+The final model was chosen based on best **F1-score** and **ROC AUC**.
 
-RobustScaler for outlier-resistant normalization
+---
 
-## Task 4 - Proxy Target Variable Engineering
+## 8. Model Deployment and API
 
-**RFM Metric Calculation**
+The model is deployed using FastAPI with Docker support.
 
-Recency: Days since last transaction
+### 🛠️ Endpoint: `/predict`
 
-Frequency: Number of transactions
+#### Request Format
+```json
+{
+  "Recency": 14,
+  "Frequency": 5,
+  "Monetary": 1200,
+  "Transaction_Hour": 16
+}
+```
 
-Monetary: Total transaction amount
+#### Response
+```json
+{
+  "risk_probability": 0.73
+}
+```
 
-**K-Means Clustering**
+Deployed using:
+- **FastAPI**
+- **Uvicorn**
+- **Docker**
+- **MLflow model loading**
 
-Scaled RFM values, used K-Means to create 3 clusters
+---
 
-Cluster with low Recency, Frequency, and Monetary defined as "high-risk"
+## 9. Testing and CI/CD Pipeline
 
-**Target Variable Creation**
+- ✅ Unit tests with `pytest` (`tests/` folder)
+- ✅ Linting with `flake8`
+- ✅ GitHub Actions for Continuous Integration
 
-is_high_risk column: 1 = high-risk, 0 = others
+```yaml
+# .github/workflows/ci.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Linter
+        run: flake8 .
+      - name: Run Tests
+        run: pytest
+```
 
-Merged back into full dataset for supervised learning
+---
 
-## Task 5 - Model Training and Tracking
+## 10. Installation
 
-**Setup**
+```bash
+git clone <repository-url>
+cd credit-risk-model
+pip install -r requirements.txt
+```
 
-Split data into training and testing sets (e.g., 80/20)
+---
 
-Use MLflow for experiment tracking
+## 11. Usage
 
-Use pytest for unit testing
+### Run API locally
+```bash
+uvicorn src.api.main:app --reload
+```
 
-**Model Training**
+Visit: [http://localhost:8000/docs](http://localhost:8000/docs) for Swagger UI.
 
-Logistic Regression (baseline)
+---
 
-Random Forest
+## 12. Contributing
 
-Gradient Boosting (e.g., LightGBM, XGBoost)
+Contributions are welcome!  
+1. Fork the repo  
+2. Create a new branch: `git checkout -b feature-branch`  
+3. Make changes and commit: `git commit -m 'Add feature'`  
+4. Push: `git push origin feature-branch`  
+5. Open a Pull Request
 
-**Hyperparameter tuning via GridSearch/RandomizedSearch with CV**
+---
 
-**Evaluation Metrics**
+## 13. License
 
-Accuracy
+This project is licensed under the **Apache License 2.0**.  
+See the [LICENSE](./LICENSE) file for more details.
 
-Precision, Recall
+---
 
-F1 Score
+## 14. Acknowledgments
 
-ROC-AUC
+- [10 Academy](https://10academy.org) for the challenge and guidance  
+- [Xente Data (Kaggle)](https://www.kaggle.com/datasets/atwine/xente-challenge) for providing the dataset  
+- Basel II Accord and HKMA for regulatory guidelines  
+- [Shichen.name Scorecard](https://shichen.name/scorecard/) for WoE & credit scoring tools
 
-**MLflow Tracking**
-
-Log experiments, metrics, and parameters
-
-Register best model in MLflow Registry
-
-**Testing**
-
-At least 2 unit tests in tests/test_data_processing.py
-
-Validate helper functions and transformations
-
-## Future Work Plan
-
-Final Model Evaluation
-
-Tune and compare models
-
-Select the most interpretable and performant one
-
-Deployment Pipeline
-
-Create REST API with FastAPI
-
-Dockerize the app
-
-Test locally (curl/Postman)
-
-Set up GitHub Actions for CI/CD
-
-Final Reporting
-
-Slide deck and technical report
-
-Model cards for stakeholders
-
-Documentation for regulators
+---

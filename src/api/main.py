@@ -27,3 +27,10 @@ def predict(data: CustomerData):
         return {"risk_probability": prob}
     except Exception as e:
         return {"detail": f"Prediction failed: {e}"}
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/ping")
+def ping():
+    return {"msg": "pong"}
