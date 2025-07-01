@@ -18,9 +18,13 @@ def load_data_csv(path):
 def summary_stats(df):
     """Print basic info and stats"""
     print(df.info())
-    print("\n--- Describe Numerical ---\n", df.describe())
+    print(
+        "\n--- Describe Numerical ---\n",
+        df.describe()
+    )
     print("\n--- Describe Categorical ---\n")
     print(df.select_dtypes(include='object').describe())
+
 
 
 def logarithmic_numerical_distribution(
