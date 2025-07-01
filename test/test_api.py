@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock, patch
 import sys
 import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 sys.path.insert(
     0,
