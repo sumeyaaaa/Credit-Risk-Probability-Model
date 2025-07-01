@@ -1,12 +1,8 @@
 import pandas as pd
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import (
-    StandardScaler,
-    RobustScaler,
-    OneHotEncoder
-)
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, RobustScaler
 
 
 def process_data(file_path):

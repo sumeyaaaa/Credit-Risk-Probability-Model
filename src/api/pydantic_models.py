@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class CustomerData(BaseModel):
     Recency: int
     Frequency: int

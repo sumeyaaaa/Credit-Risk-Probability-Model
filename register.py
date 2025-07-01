@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import mlflow
 from mlflow.tracking import MlflowClient
-from pathlib import Path
 
 # Set tracking URI
 mlruns_path = Path(

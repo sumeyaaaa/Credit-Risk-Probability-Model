@@ -1,6 +1,7 @@
 import mlflow
-from fastapi import FastAPI
 import pandas as pd
+from fastapi import FastAPI
+
 from .pydantic_models import CustomerData, PredictionResponse
 
 app = FastAPI()
