@@ -23,16 +23,14 @@ def summary_stats(df):
     print(df.select_dtypes(include="object").describe())
 
 
-def logarithmic_numerical_distribution(
-    df,
-    columns=None,
-):
+def logarithmic_numerical_distribution(df, columns=None):
+    """
+    Plot log-scale histograms for positive and negative values
+    of specified columns.
+    """
     if columns is None:
         columns = ["Amount", "Value", "FraudResult"]
 
-    """
-    Plot log-scale histograms for positive and negative values of specified columns.
-    """
     for column in columns:
         if column not in df.columns:
             print(f"Column '{column}' not found in DataFrame.")
@@ -55,13 +53,12 @@ def logarithmic_numerical_distribution(
             plt.show()
 
 
-num_cols = ["CurrencyCode", "CountryCode", "PricingStrategy"]
-
-
-def plot_numeric_distributions(df, num_cols=num_cols):
+def plot_numeric_distributions(df, num_cols=None):
     """Plot histograms for numeric columns"""
     if num_cols is None:
-        num_cols = df.select_dtypes(include=["int64", "float64"]).columns
+        num_cols = df.select_dtypes(
+            include=["int64", "float64"]
+        ).columns
 
     for col in num_cols:
         plt.figure(figsize=(8, 4))
@@ -74,25 +71,16 @@ def plot_numeric_distributions(df, num_cols=num_cols):
         plt.show()
 
 
-cat_cols = [
-    "CurrencyCode",
-    "CountryCode",
-    "ProviderId",
-    "ProductCategory",
-    "ChannelId",
-    "PricingStrategy",
-    "FraudResult",
-]
-
-
-def plot_categorical_distributions(df, cat_cols=cat_cols, top_k=10):
+def plot_categorical_distributions(df, cat_cols=None, top_k=10):
     """Plot bar plots for categorical features"""
     if cat_cols is None:
         cat_cols = df.select_dtypes(include="object").columns
 
     for col in cat_cols:
         plt.figure(figsize=(8, 4))
-        sns.countplot(data=df, x=col, order=df[col].value_counts().index)
+        sns.countplot(
+            data=df, x=col, order=df[col].value_counts().index[:top_k]
+        )
         plt.title(f"Distribution of {col}")
         plt.xticks(rotation=45)
         plt.tight_layout()
@@ -104,7 +92,10 @@ def check_missing_values(df):
     missing = df.isnull().sum()
     missing_percent = (missing / len(df)) * 100
     missing_df = pd.DataFrame(
-        {"Missing Values": missing, "Percent": missing_percent}
+        {
+            "Missing Values": missing,
+            "Percent": missing_percent
+        }
     )
     print(missing_df[missing_df["Missing Values"] > 0])
 
@@ -113,7 +104,9 @@ def plot_correlations(df):
     """Plot correlation heatmap for numeric features"""
     corr = df.select_dtypes(include=["int64", "float64"]).corr()
     plt.figure(figsize=(12, 8))
-    sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f", square=True)
+    sns.heatmap(
+        corr, annot=True, cmap="coolwarm", fmt=".2f", square=True
+    )
     plt.title("Correlation Matrix")
     plt.show()
 
@@ -163,7 +156,9 @@ def plot_cramers_v_heatmap(
 def detect_outliers(df, num_cols=None):
     """Boxplot for numeric outlier detection"""
     if num_cols is None:
-        num_cols = df.select_dtypes(include=["int64", "float64"]).columns
+        num_cols = df.select_dtypes(
+            include=["int64", "float64"]
+        ).columns
 
     for col in num_cols:
         plt.figure(figsize=(8, 4))

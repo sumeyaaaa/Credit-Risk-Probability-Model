@@ -1,15 +1,18 @@
+import os
 import pandas as pd
 
-# Define your output path
-output_path = (
-    r"C:\Users\ABC\Desktop\10Acadamy\Week 5\Credit-Risk-Probability-Model"
-    r"\data\processed"
+# Define your output path using os.path.join
+output_path = os.path.join(
+    "C:/Users/ABC/Desktop/10Acadamy/Week 5",
+    "Credit-Risk-Probability-Model",
+    "data",
+    "processed",
 )
 
 
 def convert_tz_aware_to_naive(df):
     """
-    Convert timezone-aware datetime columns in the DataFrame to timezone-unaware.
+    Convert timezone-aware datetime to timezone-unaware.
 
     Parameters:
     df (pd.DataFrame): The DataFrame to process.
@@ -33,6 +36,6 @@ def save_dataframe_to_csv(df, filename):
     filename (str): The name of the CSV file (without extension).
     """
     df = convert_tz_aware_to_naive(df)
-    full_path = f"{output_path}/{filename}.csv"
+    full_path = os.path.join(output_path, f"{filename}.csv")
     df.to_csv(full_path, index=False)
     print(f"Data saved to {full_path}")
