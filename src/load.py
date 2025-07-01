@@ -26,7 +26,6 @@ def summary_stats(df):
     print(df.select_dtypes(include='object').describe())
 
 
-
 def logarithmic_numerical_distribution(
     df,
     columns=None,
