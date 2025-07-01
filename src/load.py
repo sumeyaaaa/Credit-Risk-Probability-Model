@@ -26,8 +26,13 @@ def summary_stats(df):
 
 
 def logarithmic_numerical_distribution(
-    df, columns=['Amount', 'Value', 'FraudResult']
+    df,
+    columns=None,
 ):
+    if columns is None:
+        columns = ['Amount', 'Value', 'FraudResult']
+
+
     """
     Plot log-scale histograms for positive and negative values of specified columns.
     """

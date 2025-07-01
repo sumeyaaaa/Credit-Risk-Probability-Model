@@ -29,5 +29,6 @@ class CustomerData(BaseModel):
     ProductCategory_tv: bool
     ProductCategory_utility_bill: bool
 
+
 class PredictionResponse(BaseModel):
     risk_probability: float

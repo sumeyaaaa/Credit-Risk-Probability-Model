@@ -1,8 +1,8 @@
 import pandas as pd
 
-# Define your output path
 output_path = (
-    r"C:\Users\ABC\Desktop\10Acadamy\Week 5\Credit-Risk-Probability-Model"
+    r"C:\Users\ABC\Desktop\10Acadamy\Week 5"
+    r"\Credit-Risk-Probability-Model"
     r"\data\processed"
 )
 
