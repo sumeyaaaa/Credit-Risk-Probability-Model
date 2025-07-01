@@ -1,15 +1,14 @@
-import os
-import sys
 from unittest.mock import MagicMock, patch
+import sys
+import os
 
-# Add src to sys.path for imports
 sys.path.insert(
     0,
     os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
             '..',
-            'src',   # <-- Add 'src' here to point to the source folder
+            'src',
         )
     ),
 )
@@ -17,11 +16,9 @@ sys.path.insert(
 mock_model = MagicMock()
 mock_model.predict_proba.return_value = [[0.3, 0.7]]
 
-patcher = patch('mlflow.sklearn.load_model', return_value=mock_model)
-patcher.start()
-
-from fastapi.testclient import TestClient  # noqa: E402
-from api.main import app  # noqa: E402
+with patch('mlflow.sklearn.load_model', return_value=mock_model):
+    from fastapi.testclient import TestClient
+    from api.main import app
 
 client = TestClient(app)
 
@@ -60,7 +57,3 @@ def test_predict():
     assert response.status_code == 200
     assert "risk_probability" in response.json()
     assert abs(response.json()["risk_probability"] - 0.7) < 1e-6
-
-
-# --- Cleanup ---
-patcher.stop()
