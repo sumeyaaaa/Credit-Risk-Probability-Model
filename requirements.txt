@@ -6,3 +6,4 @@ mlflow
 pydantic
 flake8
 pytest
+httpx

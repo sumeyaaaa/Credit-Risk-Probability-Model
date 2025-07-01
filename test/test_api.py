@@ -1,25 +1,25 @@
 import os
 import sys
 from unittest.mock import MagicMock, patch
-from fastapi.testclient import TestClient
-from api.main import app  # import AFTER patching
 
 # Add src to sys.path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'src')))
 
-
-# Mock mlflow.sklearn.load_model before importing your app
+# --- Patch before importing app ---
 mock_model = MagicMock()
 mock_model.predict_proba.return_value = [[0.3, 0.7]]
 
 patcher = patch('mlflow.sklearn.load_model', return_value=mock_model)
 patcher.start()
 
+# Now import app
+from fastapi.testclient import TestClient
+from api.main import app
 
 client = TestClient(app)
 
-
+# --- Test ---
 def test_predict():
     sample_data = {
         "Recency": 1,
@@ -55,5 +55,5 @@ def test_predict():
     assert "risk_probability" in response.json()
     assert abs(response.json()["risk_probability"] - 0.7) < 1e-6
 
-
+# --- Cleanup ---
 patcher.stop()
