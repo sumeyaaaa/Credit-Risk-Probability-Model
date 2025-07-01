@@ -1,8 +1,13 @@
-version: "3.9"
-
+# docker-compose.yml (no version)
 services:
   api:
     build: .
     ports:
       - "8000:8000"
-    restart: always
+    volumes:
+     - ./mlruns:/app/mlruns
+     - ./mlruns.db:/app/mlruns.db
+    environment:
+     - MLFLOW_TRACKING_URI=http://host.docker.internal:5000
+
+    working_dir: /app

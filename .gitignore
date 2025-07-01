@@ -23,7 +23,7 @@ ENV/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
-
+mlruns
 # Data files (don’t track raw or output data)
 *.csv
 *.tsv
