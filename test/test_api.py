@@ -2,13 +2,14 @@ import os
 import sys
 from unittest.mock import MagicMock, patch
 
-# Add root to sys.path for imports
+# Add src to sys.path for imports
 sys.path.insert(
     0,
     os.path.abspath(
         os.path.join(
             os.path.dirname(__file__),
             '..',
+            'src',   # <-- Add 'src' here to point to the source folder
         )
     ),
 )
